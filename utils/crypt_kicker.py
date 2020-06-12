@@ -13,15 +13,15 @@ class CryptKicker:
                  If no param is passed, it uses a default one.
         :return:
         """
-        self.key = "The quick brown fox jumps over the lazy dog".lower() if key is None else str(key).lower()
+        self.key = "The quick brown fox jumps over the lazy dog,!." if key is None else str(key)
         self.key_length = len(self.key)
 
     @staticmethod
     def __generate_encrypted_dictionary(key):
         """
         Generates a dictionary with the values used for encryption.
-        Just encrypt the letters present in the key, anything else as special characters
-        are just copied. It allows me to identify the key later in decryption methods.
+        Encrypt all the characters present in the key, less the (space).
+        It allows me to identify the key later in decryption methods.
 
         :param key:  String with the characters uses as key for the encryption
         :return: Return Dictionary with characters encrypted
@@ -37,12 +37,17 @@ class CryptKicker:
         index = 0
         alphabet_length = len(unordered_alphabet)
         for char in key:
-            if not char.isalpha():
-                encrypted_dictionary[char] = char
-            elif char not in encrypted_dictionary:
-                encrypted_dictionary[char] = unordered_alphabet[index]
-                if index < alphabet_length:
+            if char not in encrypted_dictionary:
+                if char == " ":
+                    encrypted_dictionary[char] = char
+                elif index < alphabet_length:
+                    encrypted_dictionary[char] = unordered_alphabet[index]
                     index += 1
+                else:
+                    # If the unordered_alphabet comes to the end and there are more
+                    # chars in the key that are not in the dictionary yet, the rest of
+                    # chars will not be added to the dictionary.
+                    break
 
         return encrypted_dictionary
 
@@ -82,12 +87,14 @@ class CryptKicker:
         :param key: String used to identify the message and being able to encrypt or decrypt
         :return: Return String with encrypted key
         """
-        message = str(message).lower()
-        key = self.key if key is None else str(key).lower()
+        # Make sure of types and values for variables
+        message = str(message)
+        key = self.key if key is None else str(key)
+
+        # Functional logic
         encrypted_dictionary = self.__generate_encrypted_dictionary(key)
         encrypted_message = self.__generate_encrypted_message(message, encrypted_dictionary, key)
-        print("Message:           {}\n"
-              "Encrypted Message: {}".format(message, encrypted_message))
+
         return encrypted_message
 
 
@@ -95,3 +102,5 @@ if __name__ == "__main__":
     my_message = "Hello everyone!!! I am a Python Developer....."
     crypt_kicker = CryptKicker()
     my_encrypted_message = crypt_kicker.encrypt(my_message)
+    print("Message:           {}\n"
+          "Encrypted Message: {}".format(my_message, my_encrypted_message))
