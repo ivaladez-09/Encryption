@@ -69,26 +69,40 @@ class CryptKicker:
                                       replace original characters in message.
         :return: Return Dictionary with characters encrypted
         """
+        while True:
+            modifications_count = 0
+            # Simplify the requests
+            encrypted_chars = encrypted_dictionary.values()
+            registered_chars = encrypted_dictionary.keys()
 
-        # Simplify the requests
-        encrypted_chars = encrypted_dictionary.values()
-        registered_chars = encrypted_dictionary.keys()
+            # Get a list of no registered characters for encryption.
+            # If list empty, it means the dictionary is ready
+            no_registered_chars = [char for char in message if char not in registered_chars]
+            if not no_registered_chars:
+                break
 
-        # Get a list of no registered characters for encryption
-        no_registered_chars = [char for char in message if char not in registered_chars]
+            # Get a list of no registered characters for encryption that are as encrypted characters
+            # If list empty, it means the dictionary is ready
+            no_registered_chars_encrypted = [char for char in no_registered_chars if char in encrypted_chars]
+            if not no_registered_chars_encrypted:
+                break
 
-        # Get a list of no registered characters for encryption that are as encrypted characters
-        no_registered_chars_encrypted = [char for char in no_registered_chars if char in encrypted_chars]
+            # Replace encrypted characters from dict that are in the list of no_registered_chars_encrypted
+            for char in no_registered_chars_encrypted:
+                for k, v in encrypted_dictionary.items():
+                    if v == char:
+                        while True:
+                            random_char = random.choice(string.ascii_letters)
+                            if random_char not in encrypted_dictionary.values():
+                                encrypted_dictionary[k] = random_char
+                                modifications_count += 1
+                                break
 
-        # Replace encrypted characters from dict that are in the list of no_registered_chars_encrypted
-        for char in no_registered_chars_encrypted:
-            for k, v in encrypted_dictionary.items():
-                if v == char:
-                    while True:
-                        random_char = random.choice(string.ascii_letters)
-                        if random_char not in encrypted_dictionary.values():
-                            encrypted_dictionary[k] = random_char
-                            break
+            # If any modification was not needed, it means the dictionary is ready
+            if modifications_count == 0:
+                break
+            else:
+                pass
 
         return encrypted_dictionary
 
