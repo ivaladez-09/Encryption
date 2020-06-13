@@ -3,7 +3,7 @@ import string
 import random
 
 
-class CryptKicker:
+class Encryption:
     """This Class give us the methods for decrypting and encrypting"""
 
     def __init__(self, key=None):
@@ -262,8 +262,8 @@ class CryptKicker:
 
 if __name__ == "__main__":
     my_message = "Hello everyone!!! I am a Python Developer.."
-    crypt_kicker = CryptKicker()
-    my_encrypted_message = crypt_kicker.encrypt(my_message)
+    encryption = Encryption()
+    my_encrypted_message = encryption.encrypt(my_message)
     print("Message:           {}\n"
           "Encrypted Message: {}".format(my_message, my_encrypted_message))
-    crypt_kicker.decrypt(my_encrypted_message)
+    encryption.decrypt(my_encrypted_message)
