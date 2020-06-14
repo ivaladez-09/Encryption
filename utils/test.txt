@@ -1,5 +1,0 @@
-1. Sacar que caracteres no fueron encryptados del mensage original
-2. Verificar que los caracteres no encriptados del mensage original no esten dentro de los caracteres
-   encriptados en el diccionario
-3. Si si están, cambiar caracter encriptado del diccionario
-4. Repetir el ciclo hasta no tener algun cambio
