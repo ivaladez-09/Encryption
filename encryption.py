@@ -106,7 +106,6 @@ class Encryption:
 
         return encrypted_dictionary
 
-
     @staticmethod
     def __generate_encrypted_message(message, encrypted_dictionary, key):
         """
@@ -156,64 +155,54 @@ class Encryption:
         return encrypted_message
 
     @staticmethod
-    def __look_for_key(message=None, key=None):
+    def __generate_decrypted_dictionary(message, key):
         """
         Look for a specific string in the encrypted message that is equivalent to the key.
 
         :param message: String with the message where to look for.
-        :param key: String
-        :return: Return None on failure.
-                 Return a string with the equivalent key in message on success.
+        :param key: String used to identify the message and being able to decrypt
+        :return: Return Tuple of None on failure.
+                 Return Tuple with a decrypted dictionary and the encrypted key found in message.
         """
         message, key = str(message), str(key)
         message_length, key_length = len(message), len(key)
 
+        # Matching the sequence of characters equivalent to the key
         for position in range(0, message_length):
             max_length = position + key_length
             if max_length >= message_length:
                 return None
             encrypted_key = message[position: max_length]
-
-            # Check coincidences of characters
+            # Comparing characters and spaces
             if all(list(map(lambda chars: chars[0].isspace() == chars[1].isspace(),
                             zip(encrypted_key, key)))):
-                return encrypted_key
+                decrypted_dictionary = {k: v for k, v in zip(encrypted_key, key)}
+                # Debug prints
+                print("\n - Encrypted key: {}\n"
+                      " - Decrypted key: {}\n"
+                      " - Dictionary: {}\n".format(encrypted_key, key, decrypted_dictionary))
+                return decrypted_dictionary, encrypted_key
 
-        return None
+        return None, None
 
-    def __match_characters(self, message=""):
+    @staticmethod
+    def __generate_decrypted_message(message, decrypted_dictionary):
         """
-        Compare characters from key crypted with real meaning of key (self.key) to get actual
-        value of each character in the message.
-
-        param message_key: String with the message with you want to compare key
-
-        return: None for error, Dictionary with matches of characters found
-        """
-        if len(message) != self.key_length:
-            return None
-        match_characters = {k: v for k, v in zip(message, self.key)}
-
-        return match_characters
-
-    def __replace_chars(self, message, match_characters):
-        """
-        Replace characters from message with found in dictionary(match_characters).
+        Replace characters from message with found chars in decrypted_dictionary.
         It substitute one at the time, to avoid substitute a valid character.
 
-        param message: String with the characters to Replace
-        param match_characters: Dictionary with keys found from self.key and with its real value
+        param message: String with the characters to be replaced
+        param decrypted_dictionary: Dictionary with values of decrypted characters
 
-        return: None for error, String with the values of dictionary insted of keys
+        return: String with the values of dictionary instead of keys
         """
-        if isinstance(match_characters, dict) is False:
-            return None
+        decrypted_dictionary = dict(decrypted_dictionary)
 
         message_decrypted = message[:]
         tem_message = list()
         for char in message_decrypted:
-            if char in match_characters.keys():
-                tem_message.append(match_characters[char])
+            if char in decrypted_dictionary.keys():
+                tem_message.append(decrypted_dictionary[char])
             else:
                 tem_message.append(char)
         message_decrypted = "".join(tem_message)
@@ -226,7 +215,7 @@ class Encryption:
 
         :param message: String with the encrypted message
         :param key: String
-        :return: Return 'NO SE ENCONTRO SOLUCION' on failure.
+        :return: Return 'No solution found' on failure.
                  Return string with the decrypted message on success.
                  Return None on invalid message
         """
@@ -234,36 +223,28 @@ class Encryption:
         message = str(message)
         key = self.key if key is None else str(key)
 
-        # Get piece of message that represents the key
-        encrypted_key = self.__look_for_key(message, key)
-        if encrypted_key is None:
-            return "NO SE ENCONTRO SOLUCION"
-        print("\n - Encrypted key: {}".format(encrypted_key))
-        print(" - Decrypted key: {}".format(key))
-
-        # Get dictionary with meaning of crypted characters
-        match_characters = self.__match_characters(encrypted_key)
-        if match_characters is None:
-            return "NO SE ENCONTRO SOLUCION"
-        print(" - Dictionary: {}".format(match_characters))
+        # Get dictionary with the meaning of encrypted characters and
+        # a piece of message that represents the key
+        decrypted_dictionary, encrypted_key = self.__generate_decrypted_dictionary(message, key)
+        if decrypted_dictionary is None or encrypted_key is None:
+            return "No solution found"
 
         # Remove encrypted_key and white spaces
         message = message.replace(encrypted_key, "")
-        message = message.replace("  ", " ")
-        message = message.strip()
+        message = message.replace("  ", " ").strip()
 
         # Substitute characters in messages based on dictionary
-        message_decrypted = self.__replace_chars(message, match_characters)
-        if message_decrypted is None:
-            return "NO SE ENCONTRO SOLUCION"
-        print(" - Message decrypted: {}\n\n".format(message_decrypted))
+        message_decrypted = self.__generate_decrypted_message(message, decrypted_dictionary)
+
         return message_decrypted
 
 
 if __name__ == "__main__":
     my_message = "Hello everyone!!! I am a Python Developer.."
-    encryption = Encryption()
+    encryption = Encryption()  # Use default key
     my_encrypted_message = encryption.encrypt(my_message)
-    print("Message:           {}\n"
-          "Encrypted Message: {}".format(my_message, my_encrypted_message))
-    encryption.decrypt(my_encrypted_message)
+    print(" - Original Message:  {}\n"
+          " - Encrypted Message: {}".format(my_message, my_encrypted_message))
+    my_decrypted_message = encryption.decrypt(my_encrypted_message)
+    print(" - Encrypted Message: {}\n"
+          " - Decrypted Message: {}".format(my_encrypted_message, my_decrypted_message))
