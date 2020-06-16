@@ -83,26 +83,26 @@ class Encryption:
 
             # Get a list of no registered characters for encryption that are as encrypted characters
             # If list empty, it means the dictionary is ready
-            no_registered_chars_encrypted = [char for char in no_registered_chars if char in encrypted_chars]
+            no_registered_chars_encrypted = [char for char in no_registered_chars
+                                             if char in encrypted_chars]
             if not no_registered_chars_encrypted:
                 break
 
-            # Replace encrypted characters from dict that are in the list of no_registered_chars_encrypted
+            # Replace encrypted characters that are in the list of no_registered_chars_encrypted
+            # from the encrypted dictionary
             for char in no_registered_chars_encrypted:
-                for k, v in encrypted_dictionary.items():
-                    if v == char:
+                for en_key, en_val in encrypted_dictionary.items():
+                    if en_val == char:
                         while True:
                             random_char = random.choice(string.ascii_letters)
                             if random_char not in encrypted_dictionary.values():
-                                encrypted_dictionary[k] = random_char
+                                encrypted_dictionary[en_key] = random_char
                                 modifications_count += 1
                                 break
 
             # If any modification was not needed, it means the dictionary is ready
             if modifications_count == 0:
                 break
-            else:
-                pass
 
         return encrypted_dictionary
 
@@ -240,11 +240,11 @@ class Encryption:
 
 
 if __name__ == "__main__":
-    my_message = "Hello everyone!!! I am a Python Developer.."
+    MESSAGE = "Hello everyone!!! I am a Python Developer.."
     encryption = Encryption()  # Use default key
-    my_encrypted_message = encryption.encrypt(my_message)
+    ENCRYPTED_MESSAGE = encryption.encrypt(MESSAGE)
     print(" - Original Message:  {}\n"
-          " - Encrypted Message: {}".format(my_message, my_encrypted_message))
-    my_decrypted_message = encryption.decrypt(my_encrypted_message)
+          " - Encrypted Message: {}".format(MESSAGE, ENCRYPTED_MESSAGE))
+    DECRYPTED_MESSAGE = encryption.decrypt(ENCRYPTED_MESSAGE)
     print(" - Encrypted Message: {}\n"
-          " - Decrypted Message: {}".format(my_encrypted_message, my_decrypted_message))
+          " - Decrypted Message: {}".format(ENCRYPTED_MESSAGE, DECRYPTED_MESSAGE))
